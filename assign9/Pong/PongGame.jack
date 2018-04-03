@@ -1,0 +1,163 @@
+class PongGame {
+	field Rectangle left; //left paddle
+	field Rectangle right; //right paddle
+	field Rectangle ball; //ball
+	field boolean goingLeft, goingUp; //directional booleans
+	field int side, direction; //which side moves in which direction
+	field boolean exit; //is the game done?
+	
+	constructor PongGame new() {
+		//paddles are 4 wide and 50 tall, ball is 4x4 square
+		let left = Rectangle.new(0, 100, 4, 150);
+		let right = Rectangle.new(507, 100, 511, 150);
+		let ball = Rectangle.new(255, 100, 259, 104);
+		let goingLeft = true;
+		let goingUp = true;
+		let direction = 0;
+		let side = -1;
+		let exit = false;
+		return this;
+	}
+	
+	//dealloc things
+	method void dispose() {
+		do Memory.deAlloc(left);
+		do Memory.deAlloc(right);
+		do Memory.deAlloc(ball);
+		do Memory.deAlloc(this);
+		return;
+	}
+	
+	//move the correct side in the correct direction
+	method void moveSquare() {
+		if (side = 0) {
+			if (direction = 1) { do left.moveUp(2); }
+			if (direction = 2) { do left.moveDown(2); }
+			if (direction = 3) { do left.moveLeft(); }
+			if (direction = 4) { do left.moveRight(); }
+		}
+		if (side = 1) {
+			if (direction = 1) { do right.moveUp(2); }
+			if (direction = 2) { do right.moveDown(2); }
+			if (direction = 3) { do right.moveLeft(); }
+			if (direction = 4) { do right.moveRight(); }
+		}
+      return;
+   }
+   
+   method void moveBall() {
+		//get all the position vars
+		var int bx1, lx2, bx2, rx1, by1, by2, ly1, ly2, ry1, ry2, lx1, rx2;
+		let bx1 = ball.getx1();
+		let lx2 = left.getx2();
+		let bx2 = ball.getx2();
+		let rx1 = right.getx1();
+		let by1 = ball.gety1();
+		let by2 = ball.gety2();
+		let ly1 = left.gety1();
+		let ly2 = left.gety2();
+		let ry1 = right.gety1();
+		let ry2 = right.gety2();
+		let lx1 = left.getx1();
+		let rx2 = right.getx2();
+		
+		//hitting top?
+		if (by1 < 6) {
+			let goingUp = false;
+		}
+		//hitting bottom?
+		if (by2 > 249) {
+			let goingUp = true;
+		}
+		
+		//past left edge?
+		if (bx1 < 4) {
+			let exit = true;
+		}
+		
+		//past right edge?
+		if (bx2 > 507) {
+			let exit = true;
+		}
+		
+		//hitting left paddle?
+		if (bx1 < lx2 & (by1 < ly2 & by2 > ly1)) {
+			let goingLeft = false;
+			let exit = false;
+		}
+		
+		//hitting right paddle?
+		if (bx2 > rx1 & (by1 < ry2 & by2 > ry1)) {
+			let goingLeft = true;
+			let exit = false;
+		}
+		
+		//move the ball in the correct direction
+		if (goingLeft) {
+			do ball.moveLeft();
+		}
+		if (~goingLeft) {
+			do ball.moveRight();
+		}
+		
+		if (goingUp) {
+			do ball.moveUp(5);
+		} 
+		if (~goingUp) {
+			do ball.moveDown(5);
+		}
+		
+		return;
+   }
+   
+   //game logic
+	method void run() {
+		var char key;
+		
+		while (~exit) {
+			//wait for key press but still move ball
+			while (key = 0) {
+				let key = Keyboard.keyPressed();
+				do moveBall();
+				do Sys.wait(20);  // delays the next movement
+				if (exit) {
+					return;
+				}
+			}
+			
+			//do the correct key press logic
+			if (key = 81)  { let exit = true; }     // q key
+			if (key = 131) { // up arrow
+				let direction = 1; 
+				let side = 1;
+			}   
+			if (key = 133) { // down arrow
+				let direction = 2; 
+				let side = 1;
+			}   
+			if (key = 90) { // z
+				let direction = 1; 
+				let side = 0;
+			}   
+			if (key = 88) { // x
+				let direction = 2; 
+				let side = 0;
+			}   
+
+			// waits for the key to be released
+			while (~(key = 0)) {
+				let key = Keyboard.keyPressed();
+				do moveSquare();
+				do moveBall();
+				do Sys.wait(20);  // delays the next movement
+				if (exit) {
+					return;
+				}
+			}
+			
+		}
+		return;
+	}
+	
+	
+}

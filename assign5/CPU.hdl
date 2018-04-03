@@ -1,0 +1,125 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in 
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine 
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input 
+ * holds the value of this location. If the current instruction needs 
+ * to write a value to M, the value is placed in outM, the address 
+ * of the target location is placed in the addressM output, and the 
+ * writeM control bit is asserted. (When writeM==0, any value may 
+ * appear in outM). The outM and writeM outputs are combinational: 
+ * they are affected instantaneously by the execution of the current 
+ * instruction. The addressM and pc outputs are clocked: although they 
+ * are affected by the execution of the current instruction, they commit 
+ * to their new values only in the next time step. If reset==1 then the 
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+ * than to the address resulting from executing the current instruction. 
+ */
+
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+    // Put your code here:
+	//NOTE: this is probably not super efficient, but i'd rather reference
+	//all these bits by a name rather than instruction[x] for my own sanity
+	//get the opcode
+	And(a = true, b = instruction[15], out = iscinstruction);
+	Not(in = iscinstruction, out = isainstruction);
+	
+	//get the a bit
+	Or(a = false, b = instruction[12], out = abit);
+	
+	//get the c bits
+	Or(a = false, b = instruction[11], out = zx);
+	Or(a = false, b = instruction[10], out = nx);
+	Or(a = false, b = instruction[9], out = zy);
+	Or(a = false, b = instruction[8], out = ny);
+	Or(a = false, b = instruction[7], out = f);
+	Or(a = false, b = instruction[6], out = no);
+	
+	//get d bits
+	Or(a = false, b = instruction[5], out = d1);
+	Or(a = false, b = instruction[4], out = d2);
+	Or(a = false, b = instruction[3], out = d3);
+	
+	//get j bits
+	Or(a = false, b = instruction[2], out = j1);
+	Or(a = false, b = instruction[1], out = j2);
+	Or(a = false, b = instruction[0], out = j3);
+	
+	//A register stuff
+	Mux16(a = ALUoutput, b = instruction, sel = isainstruction,
+	out = aregistervalue);
+	
+	//only load into A register if you are doing an a instruction or
+	//d1 bit is set for a c instruction
+	And(a = iscinstruction, b = d1, out = cinstructionaregister);
+	Or(a = isainstruction, b = cinstructionaregister, out = loadA);
+	
+	//actually run the A register
+	ARegister(in = aregistervalue, load = loadA, out = registerA,
+	out[0..14] = addressM);
+	
+	//D register stuff
+	//you should write to D register if it is a c instruction and the
+	//d2 bit is set
+	And(a = d2, b = iscinstruction, out = writeD);
+	DRegister(in = ALUoutput, load = writeD, out = registerD);
+	
+	//get input into ALU from inM and A register
+	Mux16(a = registerA, b = inM, sel = abit, out = ALUinput);
+	
+	//do the ALU calculation
+	ALU(x = registerD, y = ALUinput, zx = zx, nx = nx, zy = zy, ny = ny,
+	f = f, no = no, zr = zr, ng = ng, out = ALUoutput, out = outM);
+	
+	//writeM
+	//writeM should be set if d3 bit is set and it is a c instruction
+	And(a = d3, b = iscinstruction, out = writeM);
+	
+	//PC stuff
+	//should we jump or not?
+	//jump if zero depends on if alu zr is set and if j2 is set
+	And(a = zr, b = j2, out = jumpifzero);
+	
+	//jump if not greater than, which is if ng is set and if j1 is set
+	And(a = ng, b = j1, out = jumpifng);
+	
+	//jump if greater than depends on if ng and zr are both not set and 
+	//if j3 is set
+	Not(in = ng, out = notng);
+	Not(in = zr, out = notzr);
+	And(a = notng, b = notzr, out = notzrandnotng);
+	And(a = notzrandnotng, b = j3, out = jumpifgt);
+	
+	//or the jump flags together to determine if we need to jump at all
+	Or(a = jumpifzero, b = jumpifng, out = jumpor1);
+	Or(a = jumpor1, b = jumpifgt, out = jumpbits);
+	
+	//we should only jump if it is a c instruction
+	And(a = iscinstruction, b = jumpbits, out = shouldjump);
+	
+	//actually do the PC
+	PC(in = registerA, load = shouldjump, reset = reset, inc = true,
+	out[0..14] = pc);
+}

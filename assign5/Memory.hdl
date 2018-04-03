@@ -1,0 +1,49 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/Memory.hdl
+
+/**
+ * The complete address space of the Hack computer's memory,
+ * including RAM and memory-mapped I/O. 
+ * The chip facilitates read and write operations, as follows:
+ *     Read:  out(t) = Memory[address(t)](t)
+ *     Write: if load(t-1) then Memory[address(t-1)](t) = in(t-1)
+ * In words: the chip always outputs the value stored at the memory 
+ * location specified by address. If load==1, the in value is loaded 
+ * into the memory location specified by address. This value becomes 
+ * available through the out output from the next time step onward.
+ * Address space rules:
+ * Only the upper 16K+8K+1 words of the Memory chip are used. 
+ * Access to address>0x6000 is invalid. Access to any address in 
+ * the range 0x4000-0x5FFF results in accessing the screen memory 
+ * map. Access to address 0x6000 results in accessing the keyboard 
+ * memory map. The behavior in these addresses is described in the 
+ * Screen and Keyboard chip specifications given in the book.
+ */
+
+CHIP Memory {
+    IN in[16], load, address[15];
+    OUT out[16];
+
+    PARTS:
+    // Put your code here:
+	//0x6000 is kbd, which is 14th bit of address being 1 (sel = 11), 0x4000 is screen, which is 13th bit of address being 1 (sel = 10)
+	DMux4Way(in = load, sel = address[13..14], a = RAM1, b = RAM2, c = screen, d = kbd);
+	
+	//since it can be RAM1 or RAM2 being loaded, we need to or these
+	Or(a = RAM1, b = RAM2, out = RAM);
+	
+	//actually load the RAM, using address 0..13 since this is the only part that corresponds to actual ram
+	RAM16K(in = in, load = RAM, address = address[0..13], out = RAMout);
+	
+	//do the screen load part, with address being address[0..12] since screen starts at 0b10000000000000 to 0b10111111111111, with the 1s being in 0..12
+	Screen(in = in, load = screen, address = address[0..12], out = screenout);
+	
+	//get the output from keyboard
+	Keyboard(out = kbdout);
+	
+	//mux the output correctly using the same sel as the dmux
+	Mux4Way16(a = RAMout, b = RAMout, c = screenout, d = kbdout, sel = address[13..14], out = out);
+	
+}

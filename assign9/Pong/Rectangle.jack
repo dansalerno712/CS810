@@ -1,0 +1,101 @@
+class Rectangle {
+	field int x1, y1, x2, y2;
+
+   /** Constructs a new square with a given location and size. */
+   constructor Rectangle new(int ax1, int ay1, int ax2, int ay2) {
+      let x1 = ax1;
+	  let y1 = ay1;
+	  let x2 = ax2;
+	  let y2 = ay2;
+	  do draw();
+	  return this;
+   }
+
+   //get methods
+   method int getx1() {
+		return x1;
+   }
+   
+   method int getx2() {
+		return x2;
+   }
+   
+   method int gety1() {
+		return y1;
+   }
+   
+   method int gety2() {
+		return y2;
+   }
+   /** Disposes this square. */
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /** Draws the square on the screen. */
+   method void draw() {
+      do Screen.setColor(true);
+      do Screen.drawRectangle(x1, y1, x2, y2);
+      return;
+   }
+
+   //erase the current rect
+   method void erase() {
+      do Screen.setColor(false);
+      do Screen.drawRectangle(x1, y1, x2, y2);
+      return;
+   }
+
+   //move up a variable amount
+   method void moveUp(int amount) {
+      if (y1 - amount > 0) {
+         do Screen.setColor(false);
+         do Screen.drawRectangle(x1, y1, x2, y2);
+         let y1 = y1 - amount;
+		 let y2 = y2 - amount;
+         do Screen.setColor(true);
+         do Screen.drawRectangle(x1, y1, x2, y2);
+      }
+      return;
+   }
+
+   //move down a variable amount
+   method void moveDown(int amount) {
+      if (y2 + amount < 255) {
+         do Screen.setColor(false);
+         do Screen.drawRectangle(x1, y1, x2, y2);
+         let y1 = y1 + amount;
+		 let y2 = y2 + amount;
+         do Screen.setColor(true);
+         do Screen.drawRectangle(x1, y1, x2, y2);
+      }
+      return;
+   }
+
+   //move left 2 pixels
+   method void moveLeft() {
+      if (x1 > 1) {
+         do Screen.setColor(false);
+         do Screen.drawRectangle(x1, y1, x2, y2);
+         let x1 = x1 - 2;
+		 let x2 = x2 - 2;
+         do Screen.setColor(true);
+         do Screen.drawRectangle(x1, y1, x2, y2);
+      }
+      return;
+   }
+
+   //move right 2 pixels
+   method void moveRight() {
+      if (x2 < 510) {
+         do Screen.setColor(false);
+         do Screen.drawRectangle(x1, y1, x2, y2);
+         let x1 = x1 + 2;
+		 let x2 = x2 + 2;
+         do Screen.setColor(true);
+         do Screen.drawRectangle(x1, y1, x2, y2);
+      }
+      return;
+   }
+}

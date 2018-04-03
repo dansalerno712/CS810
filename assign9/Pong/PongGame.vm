@@ -1,0 +1,455 @@
+function PongGame.new 0
+push constant 8
+call Memory.alloc 1
+pop pointer 0
+push constant 0
+push constant 100
+push constant 4
+push constant 150
+call Rectangle.new 4
+pop this 0
+push constant 507
+push constant 100
+push constant 511
+push constant 150
+call Rectangle.new 4
+pop this 1
+push constant 255
+push constant 100
+push constant 259
+push constant 104
+call Rectangle.new 4
+pop this 2
+push constant 1
+neg
+pop this 3
+push constant 1
+neg
+pop this 4
+push constant 0
+pop this 6
+push constant 1
+neg
+pop this 5
+push constant 0
+pop this 7
+push pointer 0
+return
+function PongGame.dispose 0
+push argument 0
+pop pointer 0
+push this 0
+call Memory.deAlloc 1
+pop temp 0
+push this 1
+call Memory.deAlloc 1
+pop temp 0
+push this 2
+call Memory.deAlloc 1
+pop temp 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return
+function PongGame.moveSquare 0
+push argument 0
+pop pointer 0
+push this 5
+push constant 0
+eq
+not
+if-goto if-false-0
+push this 6
+push constant 1
+eq
+not
+if-goto if-false-1
+push this 0
+push constant 2
+call Rectangle.moveUp 2
+pop temp 0
+goto if-true-1
+label if-false-1
+label if-true-1
+push this 6
+push constant 2
+eq
+not
+if-goto if-false-2
+push this 0
+push constant 2
+call Rectangle.moveDown 2
+pop temp 0
+goto if-true-2
+label if-false-2
+label if-true-2
+push this 6
+push constant 3
+eq
+not
+if-goto if-false-3
+push this 0
+call Rectangle.moveLeft 1
+pop temp 0
+goto if-true-3
+label if-false-3
+label if-true-3
+push this 6
+push constant 4
+eq
+not
+if-goto if-false-4
+push this 0
+call Rectangle.moveRight 1
+pop temp 0
+goto if-true-4
+label if-false-4
+label if-true-4
+goto if-true-0
+label if-false-0
+label if-true-0
+push this 5
+push constant 1
+eq
+not
+if-goto if-false-5
+push this 6
+push constant 1
+eq
+not
+if-goto if-false-6
+push this 1
+push constant 2
+call Rectangle.moveUp 2
+pop temp 0
+goto if-true-6
+label if-false-6
+label if-true-6
+push this 6
+push constant 2
+eq
+not
+if-goto if-false-7
+push this 1
+push constant 2
+call Rectangle.moveDown 2
+pop temp 0
+goto if-true-7
+label if-false-7
+label if-true-7
+push this 6
+push constant 3
+eq
+not
+if-goto if-false-8
+push this 1
+call Rectangle.moveLeft 1
+pop temp 0
+goto if-true-8
+label if-false-8
+label if-true-8
+push this 6
+push constant 4
+eq
+not
+if-goto if-false-9
+push this 1
+call Rectangle.moveRight 1
+pop temp 0
+goto if-true-9
+label if-false-9
+label if-true-9
+goto if-true-5
+label if-false-5
+label if-true-5
+push constant 0
+return
+function PongGame.moveBall 12
+push argument 0
+pop pointer 0
+push this 2
+call Rectangle.getx1 1
+pop local 0
+push this 0
+call Rectangle.getx2 1
+pop local 1
+push this 2
+call Rectangle.getx2 1
+pop local 2
+push this 1
+call Rectangle.getx1 1
+pop local 3
+push this 2
+call Rectangle.gety1 1
+pop local 4
+push this 2
+call Rectangle.gety2 1
+pop local 5
+push this 0
+call Rectangle.gety1 1
+pop local 6
+push this 0
+call Rectangle.gety2 1
+pop local 7
+push this 1
+call Rectangle.gety1 1
+pop local 8
+push this 1
+call Rectangle.gety2 1
+pop local 9
+push this 0
+call Rectangle.getx1 1
+pop local 10
+push this 1
+call Rectangle.getx2 1
+pop local 11
+push local 4
+push constant 6
+lt
+not
+if-goto if-false-10
+push constant 0
+pop this 4
+goto if-true-10
+label if-false-10
+label if-true-10
+push local 5
+push constant 249
+gt
+not
+if-goto if-false-11
+push constant 1
+neg
+pop this 4
+goto if-true-11
+label if-false-11
+label if-true-11
+push local 0
+push constant 4
+lt
+not
+if-goto if-false-12
+push constant 1
+neg
+pop this 7
+goto if-true-12
+label if-false-12
+label if-true-12
+push local 2
+push constant 507
+gt
+not
+if-goto if-false-13
+push constant 1
+neg
+pop this 7
+goto if-true-13
+label if-false-13
+label if-true-13
+push local 0
+push local 1
+lt
+push local 4
+push local 7
+lt
+push local 5
+and
+push local 6
+gt
+and
+not
+if-goto if-false-14
+push constant 0
+pop this 3
+push constant 0
+pop this 7
+goto if-true-14
+label if-false-14
+label if-true-14
+push local 2
+push local 3
+gt
+push local 4
+push local 9
+lt
+push local 5
+and
+push local 8
+gt
+and
+not
+if-goto if-false-15
+push constant 1
+neg
+pop this 3
+push constant 0
+pop this 7
+goto if-true-15
+label if-false-15
+label if-true-15
+push this 3
+not
+if-goto if-false-16
+push this 2
+call Rectangle.moveLeft 1
+pop temp 0
+goto if-true-16
+label if-false-16
+label if-true-16
+push this 3
+not
+not
+if-goto if-false-17
+push this 2
+call Rectangle.moveRight 1
+pop temp 0
+goto if-true-17
+label if-false-17
+label if-true-17
+push this 4
+not
+if-goto if-false-18
+push this 2
+push constant 5
+call Rectangle.moveUp 2
+pop temp 0
+goto if-true-18
+label if-false-18
+label if-true-18
+push this 4
+not
+not
+if-goto if-false-19
+push this 2
+push constant 5
+call Rectangle.moveDown 2
+pop temp 0
+goto if-true-19
+label if-false-19
+label if-true-19
+push constant 0
+return
+function PongGame.run 1
+push argument 0
+pop pointer 0
+label whileStart-0
+push this 7
+not
+not
+if-goto whileEnd-0
+label whileStart-1
+push local 0
+push constant 0
+eq
+not
+if-goto whileEnd-1
+call Keyboard.keyPressed 0
+pop local 0
+push pointer 0
+call PongGame.moveBall 1
+pop temp 0
+push constant 20
+call Sys.wait 1
+pop temp 0
+push this 7
+not
+if-goto if-false-20
+push constant 0
+return
+goto if-true-20
+label if-false-20
+label if-true-20
+goto whileStart-1
+label whileEnd-1
+push local 0
+push constant 81
+eq
+not
+if-goto if-false-21
+push constant 1
+neg
+pop this 7
+goto if-true-21
+label if-false-21
+label if-true-21
+push local 0
+push constant 131
+eq
+not
+if-goto if-false-22
+push constant 1
+pop this 6
+push constant 1
+pop this 5
+goto if-true-22
+label if-false-22
+label if-true-22
+push local 0
+push constant 133
+eq
+not
+if-goto if-false-23
+push constant 2
+pop this 6
+push constant 1
+pop this 5
+goto if-true-23
+label if-false-23
+label if-true-23
+push local 0
+push constant 90
+eq
+not
+if-goto if-false-24
+push constant 1
+pop this 6
+push constant 0
+pop this 5
+goto if-true-24
+label if-false-24
+label if-true-24
+push local 0
+push constant 88
+eq
+not
+if-goto if-false-25
+push constant 2
+pop this 6
+push constant 0
+pop this 5
+goto if-true-25
+label if-false-25
+label if-true-25
+label whileStart-2
+push local 0
+push constant 0
+eq
+not
+not
+if-goto whileEnd-2
+call Keyboard.keyPressed 0
+pop local 0
+push pointer 0
+call PongGame.moveSquare 1
+pop temp 0
+push pointer 0
+call PongGame.moveBall 1
+pop temp 0
+push constant 20
+call Sys.wait 1
+pop temp 0
+push this 7
+not
+if-goto if-false-26
+push constant 0
+return
+goto if-true-26
+label if-false-26
+label if-true-26
+goto whileStart-2
+label whileEnd-2
+goto whileStart-0
+label whileEnd-0
+push constant 0
+return

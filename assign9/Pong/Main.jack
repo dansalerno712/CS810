@@ -1,0 +1,10 @@
+class Main {
+    function void main() {
+        var PongGame game;
+		//make a new game and let it run to completion, then clear memory
+        let game = PongGame.new();
+        do game.run();
+        do game.dispose();
+        return;
+    }
+}
